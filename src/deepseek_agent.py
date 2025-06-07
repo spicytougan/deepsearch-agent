@@ -1,4 +1,6 @@
 import asyncio
+from tools.github_tools import GitHubTool
+from workflows.research_workflow import research_workflow
 
 class DeepSeekAgent:
     def __init__(self, llm_api_key: str):
@@ -23,7 +25,10 @@ class DeepSeekAgent:
         
     async def call_llm(self, prompt: str):
         """Call LLM API with prompt"""
-        # Implementation would use OpenAI API or similar
+        # In a real implementation, this would call an actual LLM API
+        # For demonstration, we'll simulate responses
+        if "search query" in prompt:
+            return "1. llm agents framework\n2. mcp tools integration\n3. deepsearch implementation"
         return f"LLM response to: {prompt}"
         
     async def run_tool(self, tool_name: str, params: dict):
@@ -35,9 +40,30 @@ class DeepSeekAgent:
 # Create agent instance
 agent = DeepSeekAgent(llm_api_key="your-api-key")
 
+# Register GitHub tool
+gh_tool = GitHubTool(access_token="your-github-token")
+agent.register_tool("github_search", gh_tool.search_repositories)
+
+# Register workflow
+agent.workflow(research_workflow)
+
 # Example execution
 async def main():
     print("DeepSeek Agent initialized")
+    
+    # Execute research workflow
+    result = await agent.execute_workflow(
+        "research_workflow", 
+        "LLM agents with MCP tools integration"
+    )
+    
+    # Print results
+    print("\nResearch Results:")
+    print(f"Topic: {result['topic']}")
+    for query, repos in result['results'].items():
+        print(f"\nQuery: {query}")
+        for i, repo in enumerate(repos[:3], 1):  # Show top 3 results
+            print(f"  {i}. {repo['full_name']} - Stars: {repo['stars']}")
 
 if __name__ == "__main__":
     asyncio.run(main())
